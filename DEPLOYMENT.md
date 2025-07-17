@@ -43,24 +43,9 @@ This guide will help you deploy your Activity Selector application to production
    - Click "Deploy"
    - Vercel will automatically build and deploy your frontend
 
-## Backend Deployment Options
+## Backend Deployment Options (Free)
 
-### Option 1: Railway (Recommended)
-
-1. **Create Railway account** at [railway.app](https://railway.app)
-2. **Connect your GitHub repository**
-3. **Create new service**:
-   - Select "Deploy from GitHub repo"
-   - Choose your repository
-   - Set root directory to `backend`
-4. **Environment Variables**:
-   ```
-   GOOGLE_SHEETS_CREDENTIALS_FILE=your-credentials-content
-   SPREADSHEET_ID=your-spreadsheet-id
-   ```
-5. **Deploy**: Railway will automatically detect Python and deploy
-
-### Option 2: Render
+### Option 1: Render (Recommended - Free Tier)
 
 1. **Create Render account** at [render.com](https://render.com)
 2. **Create new Web Service**:
@@ -68,10 +53,84 @@ This guide will help you deploy your Activity Selector application to production
    - Set root directory to `backend`
    - Build command: `pip install -r requirements.txt`
    - Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-3. **Environment Variables**: Same as Railway
+   - **Plan**: Free (750 hours/month)
+3. **Environment Variables**:
+   ```
+   GOOGLE_SHEETS_CREDENTIALS_FILE=your-credentials-content
+   SPREADSHEET_ID=your-spreadsheet-id
+   ```
 4. **Deploy**: Render will build and deploy automatically
 
-### Option 3: Heroku
+**Free Tier Limits:**
+- 750 hours/month (enough for 24/7 uptime)
+- Sleeps after 15 minutes of inactivity
+- 512MB RAM
+- Shared CPU
+
+### Option 2: Fly.io (Free Tier)
+
+1. **Install Fly CLI**:
+   ```bash
+   curl -L https://fly.io/install.sh | sh
+   ```
+2. **Sign up** at [fly.io](https://fly.io)
+3. **Create app**:
+   ```bash
+   cd backend
+   fly launch
+   ```
+4. **Deploy**:
+   ```bash
+   fly deploy
+   ```
+5. **Set secrets**:
+   ```bash
+   fly secrets set GOOGLE_SHEETS_CREDENTIALS_FILE="your-credentials"
+   fly secrets set SPREADSHEET_ID="your-spreadsheet-id"
+   ```
+
+**Free Tier Limits:**
+- 3 shared-cpu-1x 256mb VMs
+- 3GB persistent volume storage
+- 160GB outbound data transfer
+
+### Option 3: Railway (Limited Free)
+
+1. **Create Railway account** at [railway.app](https://railway.app)
+2. **Connect your GitHub repository**
+3. **Create new service**:
+   - Select "Deploy from GitHub repo"
+   - Choose your repository
+   - Set root directory to `backend`
+4. **Environment Variables**: Same as above
+5. **Deploy**: Railway will automatically detect Python and deploy
+
+**Free Tier Limits:**
+- $5 credit/month
+- Sleeps after inactivity
+- Good for development/testing
+
+### Option 4: PythonAnywhere (Free Tier)
+
+1. **Create account** at [pythonanywhere.com](https://pythonanywhere.com)
+2. **Upload your code** via Git or file upload
+3. **Set up virtual environment**:
+   ```bash
+   mkvirtualenv --python=/usr/bin/python3.9 myenv
+   pip install -r requirements.txt
+   ```
+4. **Configure WSGI file** for FastAPI
+5. **Set environment variables** in the web app settings
+
+**Free Tier Limits:**
+- 512MB storage
+- Limited CPU time
+- Custom domains not supported
+- Good for simple apps
+
+### Option 5: Heroku (Limited Free)
+
+**Note**: Heroku discontinued their free tier, but they offer a basic paid plan ($5/month).
 
 1. **Create Heroku account** and install CLI
 2. **Create new app**:
@@ -181,9 +240,22 @@ Once your backend is deployed, update the `VITE_API_URL` in Vercel to point to y
 
 ## Cost Optimization
 
+### Free Tier Options:
 - **Vercel**: Free tier includes 100GB bandwidth/month
+- **Render**: Free tier includes 750 hours/month (enough for 24/7)
+- **Fly.io**: Free tier includes 3 VMs and 160GB transfer
 - **Railway**: Free tier includes $5 credit/month
-- **Render**: Free tier available for hobby projects
+- **PythonAnywhere**: Free tier for simple apps
+
+### Recommended Free Stack:
+1. **Frontend**: Vercel (always free)
+2. **Backend**: Render (750 hours/month free)
+3. **Total Cost**: $0/month
+
+### When to Upgrade:
+- **Render**: If you need more than 750 hours/month ($7/month)
+- **Fly.io**: If you need more resources ($1.94/month per VM)
+- **Railway**: If you need more than $5 credit/month
 
 ---
 
