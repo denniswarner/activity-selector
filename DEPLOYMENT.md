@@ -128,7 +128,51 @@ This guide will help you deploy your Activity Selector application to production
 - Custom domains not supported
 - Good for simple apps
 
-### Option 5: Heroku (Limited Free)
+### Option 5: Firebase Functions (Free Tier)
+
+**Why Firebase is excellent:**
+- ✅ **Generous free tier** (125K invocations/month)
+- ✅ **Google Cloud integration** (perfect for Google Sheets)
+- ✅ **Automatic HTTPS and CDN**
+- ✅ **Easy deployment** with Firebase CLI
+- ✅ **No cold starts** with proper configuration
+
+1. **Install Firebase CLI**:
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. **Sign up** at [firebase.google.com](https://firebase.google.com)
+
+3. **Initialize Firebase project**:
+   ```bash
+   firebase login
+   firebase init functions
+   ```
+
+4. **Configure for Python** (Firebase Functions supports Python):
+   - Select Python runtime
+   - Set up requirements.txt
+   - Configure main.py for FastAPI
+
+5. **Deploy**:
+   ```bash
+   firebase deploy --only functions
+   ```
+
+6. **Set environment variables**:
+   ```bash
+   firebase functions:config:set google.sheets_credentials="your-credentials"
+   firebase functions:config:set google.spreadsheet_id="your-spreadsheet-id"
+   ```
+
+**Free Tier Limits:**
+- 125K invocations/month
+- 40K GB-seconds compute time
+- 5GB outbound networking
+- 1GB stored data
+
+### Option 6: Heroku (Limited Free)
 
 **Note**: Heroku discontinued their free tier, but they offer a basic paid plan ($5/month).
 
@@ -242,17 +286,28 @@ Once your backend is deployed, update the `VITE_API_URL` in Vercel to point to y
 
 ### Free Tier Options:
 - **Vercel**: Free tier includes 100GB bandwidth/month
+- **Firebase**: Free tier includes 125K invocations/month
 - **Render**: Free tier includes 750 hours/month (enough for 24/7)
 - **Fly.io**: Free tier includes 3 VMs and 160GB transfer
 - **Railway**: Free tier includes $5 credit/month
 - **PythonAnywhere**: Free tier for simple apps
 
-### Recommended Free Stack:
+### Recommended Free Stacks:
+
+**Option 1: Vercel + Firebase (Best for Google Integration)**
+1. **Frontend**: Vercel (always free)
+2. **Backend**: Firebase Functions (125K invocations/month free)
+3. **Total Cost**: $0/month
+4. **Benefits**: Perfect Google Cloud integration, no cold starts
+
+**Option 2: Vercel + Render (Best for Traditional Apps)**
 1. **Frontend**: Vercel (always free)
 2. **Backend**: Render (750 hours/month free)
 3. **Total Cost**: $0/month
+4. **Benefits**: Simple deployment, always-on service
 
 ### When to Upgrade:
+- **Firebase**: If you need more than 125K invocations/month ($0.40 per 100K)
 - **Render**: If you need more than 750 hours/month ($7/month)
 - **Fly.io**: If you need more resources ($1.94/month per VM)
 - **Railway**: If you need more than $5 credit/month
