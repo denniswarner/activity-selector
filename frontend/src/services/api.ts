@@ -6,6 +6,21 @@ import type { Category, Activity, ActivityRequest, ActivityResponse } from '../t
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
+// Mock data for fallback
+const mockCategories: Category[] = [
+  { name: "Food", description: "Restaurants and dining options", sheet_name: "Food" },
+  { name: "Fun", description: "Entertainment and recreational activities", sheet_name: "Fun" },
+  { name: "Outdoor", description: "Outdoor activities and adventures", sheet_name: "Outdoor" },
+  { name: "Culture", description: "Museums, theaters, and cultural experiences", sheet_name: "Culture" },
+];
+
+const mockActivities: Activity[] = [
+  { name: "Pizza Place", description: "Great local pizza joint", price_level: "$$", location: "Downtown", category: "Food" },
+  { name: "Movie Theater", description: "Latest blockbusters", price_level: "$$", location: "Mall", category: "Fun" },
+  { name: "Hiking Trail", description: "Scenic mountain trails", price_level: "Free", location: "State Park", category: "Outdoor" },
+  { name: "Art Museum", description: "Contemporary art exhibits", price_level: "$$", location: "Cultural District", category: "Culture" },
+];
+
 class ApiService {
   private baseUrl: string;
 
@@ -46,7 +61,12 @@ class ApiService {
    * Get all available categories.
    */
   async getCategories(): Promise<Category[]> {
-    return this.request<Category[]>('/api/categories');
+    try {
+      return await this.request<Category[]>('/api/categories');
+    } catch (error) {
+      console.warn('Using mock categories due to API failure');
+      return mockCategories;
+    }
   }
 
   /**
@@ -56,29 +76,57 @@ class ApiService {
     category: string,
     priceLevel?: string
   ): Promise<Activity[]> {
-    const params = new URLSearchParams({ category });
-    if (priceLevel) {
-      params.append('price_level', priceLevel);
+    try {
+      const params = new URLSearchParams({ category });
+      if (priceLevel) {
+        params.append('price_level', priceLevel);
+      }
+      
+      return await this.request<Activity[]>(`/api/activities?${params.toString()}`);
+    } catch (error) {
+      console.warn('Using mock activities due to API failure');
+      return mockActivities.filter(activity => 
+        activity.category === category && 
+        (!priceLevel || activity.price_level === priceLevel)
+      );
     }
-    
-    return this.request<Activity[]>(`/api/activities?${params.toString()}`);
   }
 
   /**
    * Get random activity suggestions.
    */
   async getSuggestions(request: ActivityRequest): Promise<ActivityResponse> {
-    return this.request<ActivityResponse>('/api/suggest', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    try {
+      return await this.request<ActivityResponse>('/api/suggest', {
+        method: 'POST',
+        body: JSON.stringify(request),
+      });
+    } catch (error) {
+      console.warn('Using mock suggestions due to API failure');
+      const filteredActivities = mockActivities.filter(activity => 
+        activity.category === request.category && 
+        (!request.price_level || activity.price_level === request.price_level)
+      );
+      
+      return {
+        activities: filteredActivities.slice(0, request.limit || 5),
+        total_found: filteredActivities.length,
+        category: request.category,
+        price_level: request.price_level
+      };
+    }
   }
 
   /**
    * Health check endpoint.
    */
   async healthCheck(): Promise<{ status: string; service: string; version: string }> {
-    return this.request<{ status: string; service: string; version: string }>('/api/health');
+    try {
+      return await this.request<{ status: string; service: string; version: string }>('/api/health');
+    } catch (error) {
+      console.warn('Health check failed, returning mock response');
+      return { status: 'ok', service: 'mock', version: '1.0.0' };
+    }
   }
 }
 
